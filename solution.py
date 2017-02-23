@@ -26,14 +26,14 @@ def test():
 
 		total_requests += Rn
 
+		min_latency = BIG_NUM
 		for c in endpoints[Re].connections:
 			cache = caches[c]
-			max_latency = BIG_NUM
 			if Rv in cache.stored:
-				max_latency = min(endpoints[Re].connections[c],max_latency)
+				min_latency = min(endpoints[Re].connections[c],min_latency)
 			
-		if max_latency < BIG_NUM:
-			total_saved += (endpoints[Re].datacenter - max_latency)*Rn
+		if min_latency < BIG_NUM:
+			total_saved += (endpoints[Re].datacenter - min_latency)*Rn
 
 	average_saved = total_saved*1.0/total_requests
 
@@ -55,6 +55,8 @@ def greedy_requests():
 		d = endpoints[Re].connections
 		for c in sorted(d,key=d.get):
 			cache = caches[c]
+			if Rv in cache.stored:
+				break
 			if cache.remaining > sizes[Rv]:
 				cache.stored.append(Rv)
 				cache.remaining -= sizes[Rv]
