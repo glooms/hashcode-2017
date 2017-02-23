@@ -1,5 +1,5 @@
 import sys
-
+import operator
 
 BIG_NUM = 1000000000000
 
@@ -8,13 +8,19 @@ class Cache:
 		self.size = size
 		self.remaining = size
 		self.stored = []
-                self.endpoints = {}
+                self.latencies = {}
+
+        def remaining_size(self):
+            rsum = 0
+            for v in self.stored:
+                rsum += sizes[v]
+            return self.size - rsum
 
 class Endpoint:
 	def __init__(self):
 		self.connections = {}
 		self.requests = {}
-                self.uncovered = {}
+                self.latencies = {}
 
 def test():
 	total_saved = 0
@@ -62,12 +68,28 @@ def greedy_requests():
 			
 				
 def greedy_caches():
-    for c in caches:
-        es = c.endpoints.keys()
-#        score = endpoints.
- #       for e in es:
-  #          c.endpoints[e] =
-   #     print c.endpoints
+    for _ in range(10):
+        for c in caches:
+            c.sorted = []
+            es = c.latencies.keys()
+            vids = {}
+            for e in es:
+                endpoint = endpoints[e]
+                for v_id, req_nbr in endpoint.requests.iteritems():
+                    s = req_nbr * (endpoint.latencies[v_id] - c.latencies[e]) * 1.0 / sizes[v_id]
+                    #s = req_nbr * (endpoint.latencies[v_id] - c.latencies[e])
+                    if not (v_id in vids):
+                        vids[v_id] = 0
+                    vids[v_id] += s
+            sorted_vids = sorted(vids.items(), key=operator.itemgetter(1))
+            reversed(sorted_vids)
+            for (v_id, score) in sorted_vids:
+                if sizes[v_id] < c.remaining_size():
+                    c.stored.append(v_id)
+                    for e in es:
+                        endpoints[e].latencies[v_id] = c.latencies[e]
+                        
+
 
 if len(sys.argv) > 1:
     f = open(sys.argv[1])
@@ -96,7 +118,7 @@ for i in range(0, points):
 	for i in range(0,K): #K connections to a cache server from each endpoint
 		[c,Lc] = map(int,f.readline().split())
 		e.connections[c] = Lc
-                caches[c].endpoints[i] = Lc
+                caches[c].latencies[i] = Lc
 	endpoints.append(e)
 
 requests = []
@@ -104,11 +126,13 @@ for j in range(0,reqs):
 	Rv,Re,Rn = map(int,f.readline().split())
 	#requests.append([Rv,Re,Rn])
 	endpoints[Re].requests[Rv] = Rn
+	endpoints[Re].latencies[Rv] = endpoints[Re].datacenter 
 	requests.append((Rv,Re,Rn,Rn*1.0/sizes[Rv]))
 
 #greedy_memory()
-# greedy_caches()
+greedy_caches()
 
-greedy_requests()
+#greedy_requests()
 check_correctness()
+#greedy_requests()
 test()
