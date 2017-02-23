@@ -6,6 +6,7 @@ BIG_NUM = 1000000000000
 class Cache:
 	def __init__(self,size):
 		self.size = size
+		self.stored = []
 
 class Endpoint:
 	def __init__(self):
@@ -15,8 +16,11 @@ class Endpoint:
 def test():
 	total_saved = 0
 	for req in requests:
-		[Rv,Re,Rn] = map(int,f.readline().split())
-		for cache in endpoints[Re].connections:
+		Rv = req[0]
+		Re = req[1]
+		Rn = req[2]
+		for c in endpoints[Re].connections:
+			cache = caches[c]
 			max_latency = BIG_NUM
 			if Rv in cache.stored:
 				max_latency = min(endpoints[Re].connections[cache],max_latency)
@@ -25,7 +29,16 @@ def test():
 			total_saved += (endpoints[Re].datacenter - max_latency)*Rn
 
 	print total_saved
-				
+
+def check_correctness():
+	for cache in caches:
+		total_stored = sum([sizes[Rv] for Rv in cache.stored])
+		if total_stored > cache.size:
+			print "TOTAL BREAKDOWN!"
+
+def greedy_memory():
+	print sorted(requests,key=lambda x: x[3])
+			
 
 if len(sys.argv) > 1:
     f = open(sys.argv[1])
@@ -37,19 +50,19 @@ data = map(int,f.readline().split())
 videos = data[0] #number of videos
 points = data[1] #number of endpoints
 reqs = data[2] #number of request descriptions
-caches = data[3] #number of cache servers
+num_caches = data[3] #number of cache servers
 capacities = data[4] #capacity of each server
 
 sizes = map(int,f.readline().split()) #Sizes of individual videos
 
-caches = [Cache(capacities) for idx in zip(range(caches))]
+caches = [Cache(capacities) for idx in zip(range(num_caches))]
 
 #For each endpoint: 
 endpoints = []
 for i in range(0, points):
 	L,K = map(int,f.readline().split())#L latency, K number of cache servers	
 	#endpts.append([L,K])
-	print K
+	#print K
 	e = Endpoint()
 	e.datacenter = L
 	for i in range(0,K): #K connections to a cache server from each endpoint
@@ -62,5 +75,8 @@ for j in range(0,reqs):
 	Rv,Re,Rn = map(int,f.readline().split())
 	#requests.append([Rv,Re,Rn])
 	endpoints[Re].requests[Rv] = Rn
+	requests.append((Rv,Re,Rn,Rn*1.0/sizes[Rv]))
 
+#greedy_memory()
 test()
+
