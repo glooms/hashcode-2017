@@ -8,11 +8,13 @@ class Cache:
 		self.size = size
 		self.remaining = size
 		self.stored = []
+                self.endpoints = {}
 
 class Endpoint:
 	def __init__(self):
 		self.connections = {}
 		self.requests = {}
+                self.uncovered = {}
 
 def test():
 	total_saved = 0
@@ -35,7 +37,7 @@ def test():
 
 	average_saved = total_saved*1.0/total_requests
 
-	average_saved_mus = average_saved*1000
+	average_saved_mus = average_saved * 1000
 	
 	print average_saved_mus
 
@@ -57,6 +59,15 @@ def greedy_requests():
 				cache.stored.append(Rv)
 				cache.remaining -= sizes[Rv]
 				break
+			
+				
+def greedy_caches():
+    for c in caches:
+        es = c.endpoints.keys()
+#        score = endpoints.
+ #       for e in es:
+  #          c.endpoints[e] =
+   #     print c.endpoints
 
 if len(sys.argv) > 1:
     f = open(sys.argv[1])
@@ -80,12 +91,12 @@ endpoints = []
 for i in range(0, points):
 	L,K = map(int,f.readline().split())#L latency, K number of cache servers	
 	#endpts.append([L,K])
-	#print K
 	e = Endpoint()
 	e.datacenter = L
 	for i in range(0,K): #K connections to a cache server from each endpoint
 		[c,Lc] = map(int,f.readline().split())
 		e.connections[c] = Lc
+                caches[c].endpoints[i] = Lc
 	endpoints.append(e)
 
 requests = []
@@ -95,7 +106,9 @@ for j in range(0,reqs):
 	endpoints[Re].requests[Rv] = Rn
 	requests.append((Rv,Re,Rn,Rn*1.0/sizes[Rv]))
 
+#greedy_memory()
+# greedy_caches()
+
 greedy_requests()
 check_correctness()
 test()
-
