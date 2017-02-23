@@ -16,10 +16,14 @@ class Endpoint:
 
 def test():
 	total_saved = 0
+	total_requests = 0
 	for req in requests:
 		Rv = req[0]
 		Re = req[1]
 		Rn = req[2]
+
+		total_requests += Rn
+
 		for c in endpoints[Re].connections:
 			cache = caches[c]
 			max_latency = BIG_NUM
@@ -29,7 +33,11 @@ def test():
 		if max_latency < BIG_NUM:
 			total_saved += (endpoints[Re].datacenter - max_latency)*Rn
 
-	print total_saved
+	average_saved = total_saved*1.0/total_requests
+
+	average_saved_mus
+	
+	print average_saved_mus
 
 def check_correctness():
 	for cache in caches:
