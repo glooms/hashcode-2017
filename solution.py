@@ -6,6 +6,7 @@ BIG_NUM = 1000000000000
 class Cache:
 	def __init__(self,size):
 		self.size = size
+		self.remaining = size
 		self.stored = []
 
 class Endpoint:
@@ -23,7 +24,7 @@ def test():
 			cache = caches[c]
 			max_latency = BIG_NUM
 			if Rv in cache.stored:
-				max_latency = min(endpoints[Re].connections[cache],max_latency)
+				max_latency = min(endpoints[Re].connections[c],max_latency)
 			
 		if max_latency < BIG_NUM:
 			total_saved += (endpoints[Re].datacenter - max_latency)*Rn
@@ -36,8 +37,16 @@ def check_correctness():
 		if total_stored > cache.size:
 			print "TOTAL BREAKDOWN!"
 
-def greedy_memory():
-	print sorted(requests,key=lambda x: x[3])
+def greedy_requests():
+	for req in reversed(sorted(requests,key=lambda x: x[2])):
+		Rv = req[0]
+		Re = req[1]
+		for c in endpoints[Re].connections:
+			cache = caches[c]
+			if cache.remaining > sizes[Rv]:
+				cache.stored.append(Rv)
+				cache.remaining -= sizes[Rv]
+				break
 			
 
 if len(sys.argv) > 1:
@@ -75,8 +84,8 @@ for j in range(0,reqs):
 	Rv,Re,Rn = map(int,f.readline().split())
 	#requests.append([Rv,Re,Rn])
 	endpoints[Re].requests[Rv] = Rn
-	requests.append((Rv,Re,Rn,Rn*1.0/sizes[Rv]))
+	requests.append((Rv,Re,Rn))
 
-#greedy_memory()
+greedy_requests()
 test()
 
