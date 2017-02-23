@@ -1,19 +1,24 @@
-import numpy as np
+import sys
 
 class Cache:
 	def __init__(self,size):
 		self.size = size
 
 class Endpoint:
-	pass
+	connections = {}
+        requests = {}
 
-f = open('me_at_the_zoo.in','r')
+
+if len(sys.argv) > 1:
+    f = open(sys.argv[1])
+else:
+    f = open('me_at_the_zoo.in','r')
 
 data = map(int,f.readline().split())
 
 videos = data[0] #number of videos
-endpoints = data[1] #number of endpoints
-requests = data[2] #number of request descriptions
+points = data[1] #number of endpoints
+reqs = data[2] #number of request descriptions
 caches = data[3] #number of cache servers
 capacities = data[4] #capacity of each server
 
@@ -23,8 +28,8 @@ caches = [Cache(capacities) for idx in zip(range(caches))]
 
 #For each endpoint: 
 endpoints = []
-for i in range(0,endpoints):
-	[L,K] = map(int,f.readline().split())#L latency, K number of cache servers	
+for i in range(0, points):
+	L,K = map(int,f.readline().split())#L latency, K number of cache servers	
 	#endpts.append([L,K])
 	print K
 	e = Endpoint()
@@ -35,8 +40,8 @@ for i in range(0,endpoints):
 	endpoints.append(e)
 
 requests = []
-for j in range(0,requests):
-	[Rv,Re,Rn] = map(int,f.readline().split())
+for j in range(0,reqs):
+	Rv,Re,Rn = map(int,f.readline().split())
 	#requests.append([Rv,Re,Rn])
 	endpoints[Re].requests[Rv] = Rn
 
