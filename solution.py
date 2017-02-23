@@ -35,7 +35,7 @@ def test():
 
 	average_saved = total_saved*1.0/total_requests
 
-	average_saved_mus
+	average_saved_mus = average_saved*1000
 	
 	print average_saved_mus
 
@@ -49,13 +49,14 @@ def greedy_requests():
 	for req in reversed(sorted(requests,key=lambda x: x[2])):
 		Rv = req[0]
 		Re = req[1]
-		for c in endpoints[Re].connections:
+		candidates = []
+		d = endpoints[Re].connections
+		for c in sorted(d,key=d.get):
 			cache = caches[c]
 			if cache.remaining > sizes[Rv]:
 				cache.stored.append(Rv)
 				cache.remaining -= sizes[Rv]
 				break
-			
 
 if len(sys.argv) > 1:
     f = open(sys.argv[1])
@@ -92,8 +93,9 @@ for j in range(0,reqs):
 	Rv,Re,Rn = map(int,f.readline().split())
 	#requests.append([Rv,Re,Rn])
 	endpoints[Re].requests[Rv] = Rn
-	requests.append((Rv,Re,Rn))
+	requests.append((Rv,Re,Rn,Rn*1.0/sizes[Rv]))
 
 greedy_requests()
+check_correctness()
 test()
 
