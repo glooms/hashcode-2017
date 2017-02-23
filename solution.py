@@ -1,13 +1,31 @@
 import sys
 
+
+BIG_NUM = 1000000000000
+
 class Cache:
 	def __init__(self,size):
 		self.size = size
 
 class Endpoint:
-	connections = {}
-        requests = {}
+	def __init__(self):
+		self.connections = {}
+		self.requests = {}
 
+def test():
+	total_saved = 0
+	for req in requests:
+		[Rv,Re,Rn] = map(int,f.readline().split())
+		for cache in endpoints[Re].connections:
+			max_latency = BIG_NUM
+			if Rv in cache.stored:
+				max_latency = min(endpoints[Re].connections[cache],max_latency)
+			
+		if max_latency < BIG_NUM:
+			total_saved += (endpoints[Re].datacenter - max_latency)*Rn
+
+	print total_saved
+				
 
 if len(sys.argv) > 1:
     f = open(sys.argv[1])
@@ -45,9 +63,4 @@ for j in range(0,reqs):
 	#requests.append([Rv,Re,Rn])
 	endpoints[Re].requests[Rv] = Rn
 
-
-
-
-
-
-	
+test()
