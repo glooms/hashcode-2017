@@ -132,9 +132,9 @@ for j in range(0,reqs):
 	requests.append((Rv,Re,Rn,Rn*1.0/sizes[Rv]))
 
 #greedy_memory()
-greedy_caches()
+#greedy_caches()
 
-#greedy_requests()
+greedy_requests()
 check_correctness()
 #greedy_requests()
 test()
